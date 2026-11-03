@@ -1,1 +1,1 @@
-Git branches allow independant development
+Git branches allow independent development

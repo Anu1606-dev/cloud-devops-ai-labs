@@ -1,1 +1,38 @@
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.ppk
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# SSH and cloud credentials
+.ssh/
+.aws/
+.azure/
+.gcloud/
+
+# Dependencies and generated files
+node_modules/
+dist/
+build/
+coverage/
+__pycache__/
+*.pyc
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Local editor settings
+.vscode/
+.idea/
+
+# Allow the synthetic Day 14 lab log as learning evidence
+!day14-monitoring-cost/logs/application.log

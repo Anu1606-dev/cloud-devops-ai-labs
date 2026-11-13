@@ -1,0 +1,6 @@
+service,monthly_estimate_usd
+EC2,14
+EBS,4
+S3,1.5
+CloudWatch,2
+DataTransfer,1

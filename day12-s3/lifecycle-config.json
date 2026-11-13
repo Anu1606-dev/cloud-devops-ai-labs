@@ -1,0 +1,14 @@
+{
+  "Rules": [
+    {
+      "ID": "CleanupIncompleteUploads",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": ""
+      },
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 7
+      }
+    }
+  ]
+}

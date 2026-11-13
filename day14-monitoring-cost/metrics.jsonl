@@ -1,0 +1,5 @@
+{"timestamp":"2026-11-13T09:00:01Z","service":"checkout-api","status":200,"latency_ms":120}
+{"timestamp":"2026-11-13T09:00:05Z","service":"checkout-api","status":500,"latency_ms":720}
+{"timestamp":"2026-11-13T09:01:10Z","service":"checkout-api","status":200,"latency_ms":220}
+{"timestamp":"2026-11-13T09:02:15Z","service":"checkout-api","status":503,"latency_ms":840}
+{"timestamp":"2026-11-13T09:03:20Z","service":"checkout-api","status":200,"latency_ms":180}

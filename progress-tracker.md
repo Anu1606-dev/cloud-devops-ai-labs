@@ -21,7 +21,7 @@ operations, automation, and AI-ready engineering foundations.
 | 12 | Amazon S3 & Cloud Storage | ✅ Completed |
 | 13 | Serverless: Lambda & API Gateway | ✅ Completed |
 | 14 | CloudWatch Monitoring & Cost Management | ✅ Completed |
-| 15 | Docker Basics | ⏳ Upcoming |
+| 15 | Docker Basics | ✅ Completed |
 | 16 | Dockerize a Node.js Application | ⏳ Upcoming |
 | 17 | Docker Compose & Configuration | ⏳ Upcoming |
 | 18–30 | Remaining roadmap topics | ⏳ Upcoming |

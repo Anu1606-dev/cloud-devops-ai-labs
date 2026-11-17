@@ -11,7 +11,7 @@ A hands-on portfolio documenting my learning journey in Cloud Engineering, Linux
 - Containers and automation
 
 ## 🧰 Technologies
-Linux | Ubuntu | AWS | Git | GitHub | Python | JavaScript | Bash | Node.js | JSON
+Linux | Ubuntu | AWS | Docker | Git | GitHub | Python | JavaScript | Bash | Node.js | JSON
 
 ## 📚 Learning Progress
 
@@ -27,7 +27,7 @@ Linux | Ubuntu | AWS | Git | GitHub | Python | JavaScript | Bash | Node.js | JSO
 | 12 | Amazon S3 | Completed |
 | 13 | Serverless & API Gateway | Completed |
 | 14 | CloudWatch & Cost Management | Completed |
-| 15 | Docker Basics | Upcoming |
+| 15 | Docker Basics | Completed |
 | 16 | Dockerize Node.js | Upcoming |
 | 17 | Docker Compose | Upcoming |
 
@@ -40,6 +40,11 @@ Linux | Ubuntu | AWS | Git | GitHub | Python | JavaScript | Bash | Node.js | JSO
 - S3 versioning and security simulations
 - Lambda handler and local API Gateway simulation
 - Log analysis, metrics, and budget-monitoring scripts
+- Docker image management, Nginx container deployment, port mapping, and container lifecycle operations
+
+### 📂 Daily Lab Documentation
+
+- [Day 15 — Docker Basics](day15-docker-basics/README.md)
 
 ## 📝 Detailed Learning Notes
 

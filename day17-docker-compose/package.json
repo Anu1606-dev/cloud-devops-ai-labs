@@ -1,0 +1,13 @@
+{
+  "name": "day17-compose-app",
+  "version": "1.0.0",
+  "description": "Node.js and Redis multi-service Docker Compose lab",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "redis": "^5.8.2"
+  }
+}

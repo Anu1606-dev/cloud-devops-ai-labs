@@ -27,8 +27,13 @@ services:
     image: redis:alpine
     container_name: day17-redis
     restart: unless-stopped
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
+
+volumes:
+  redis_data:

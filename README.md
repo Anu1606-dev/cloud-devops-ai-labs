@@ -29,7 +29,7 @@ Linux | Ubuntu | AWS | Docker | Git | GitHub | Python | JavaScript | Bash | Node
 | 14 | CloudWatch & Cost Management | Completed |
 | 15 | Docker Basics | Completed |
 | 16 | Dockerize Node.js | Completed |
-| 17 | Docker Compose | Upcoming |
+| 17 | Docker Compose | Completed |
 
 ## 🧪 Practical Highlights
 - Linux service troubleshooting with systemd
@@ -41,11 +41,17 @@ Linux | Ubuntu | AWS | Docker | Git | GitHub | Python | JavaScript | Bash | Node
 - Lambda handler and local API Gateway simulation
 - Log analysis, metrics, and budget-monitoring scripts
 - Docker image management, Nginx container deployment, port mapping, and container lifecycle operations
+- Multi-container application orchestration using Docker Compose
+- Environment variable and configuration management
+- Container health checks and log inspection
+- Docker networking and persistent named volumes
+- Redis connectivity and application endpoint verification
 
 ### 📂 Daily Lab Documentation
 
 - [Day 15 — Docker Basics](day15-docker-basics/README.md)
 - [Day 16 — Dockerize Node.js](day16-dockerize-nodejs/README.md)
+- [Day 17 — Docker Compose & Configuration](day17-docker-compose/README.md)
 
 ## 📝 Detailed Learning Notes
 

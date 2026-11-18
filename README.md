@@ -28,7 +28,7 @@ Linux | Ubuntu | AWS | Docker | Git | GitHub | Python | JavaScript | Bash | Node
 | 13 | Serverless & API Gateway | Completed |
 | 14 | CloudWatch & Cost Management | Completed |
 | 15 | Docker Basics | Completed |
-| 16 | Dockerize Node.js | Upcoming |
+| 16 | Dockerize Node.js | Completed |
 | 17 | Docker Compose | Upcoming |
 
 ## 🧪 Practical Highlights
@@ -45,6 +45,7 @@ Linux | Ubuntu | AWS | Docker | Git | GitHub | Python | JavaScript | Bash | Node
 ### 📂 Daily Lab Documentation
 
 - [Day 15 — Docker Basics](day15-docker-basics/README.md)
+- [Day 16 — Dockerize Node.js](day16-dockerize-nodejs/README.md)
 
 ## 📝 Detailed Learning Notes
 

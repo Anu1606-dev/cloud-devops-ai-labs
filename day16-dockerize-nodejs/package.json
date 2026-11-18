@@ -1,0 +1,12 @@
+{
+  "name": "day16-docker-nodejs",
+  "version": "1.0.0",
+  "description": "A Node.js application containerized using Docker",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

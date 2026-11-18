@@ -13,10 +13,13 @@ redisClient.on("error", (err) => {
 });
 
 async function connectRedis() {
-    while (!redisClient.isOpen) {
+    while (!redisClient.isReady) {
         try {
-            await redisClient.connect();
-            console.log("Connected to Redis successfully!");
+            if (!redisClient.isOpen) {
+                await redisClient.connect();
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
         } catch (error) {
             console.error("Redis connection failed. Retrying in 2 seconds...");
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -31,9 +34,24 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/health", (req, res) => {
+    if (redisClient.isReady) {
+        return res.status(200).json({
+            status: "healthy",
+            redis: "ready"
+        });
+    }
+
+    return res.status(503).json({
+        status: "unhealthy",
+        redis: "not ready"
+    });
+});
+
 app.get("/redis", async (req, res) => {
     try {
         const response = await redisClient.ping();
+
         res.json({
             redis: "connected",
             response
@@ -48,5 +66,6 @@ app.get("/redis", async (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`API running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     connectRedis();
 });

@@ -36,3 +36,8 @@ Thumbs.db
 
 # Allow the synthetic Day 14 lab log as learning evidence
 !day14-monitoring-cost/logs/application.log
+
+# Local environment files
+.env
+.env.*
+!.env.example

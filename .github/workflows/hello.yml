@@ -1,22 +1,25 @@
-name: Day 19 - GitHub Actions
+name: Day 19 - GitHub Actions CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  first-workflow:
+  repository-checks:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Welcome message
-        run: echo "GitHub Actions is working!"
+      - name: Verify Day 19 README
+        run: test -f day19-github-actions/README.md
 
-      - name: Display date
-        run: date
+      - name: Verify Day 18 health check script
+        run: test -f day18-bash-health-check/health-check.sh
 
-      - name: Check repository files
-        run: ls -la
+      - name: Validate Bash syntax
+        run: bash -n day18-bash-health-check/health-check.sh
+
+      - name: Display success
+        run: echo "All CI checks passed!"

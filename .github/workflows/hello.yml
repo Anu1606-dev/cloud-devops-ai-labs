@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Verify Day 19 README
-        run: test -f day19-github-actions/README.md
+        run: test -f day19-github-actions/missing-file.md
 
       - name: Verify Day 18 health check script
         run: test -f day18-bash-health-check/health-check.sh

@@ -41,3 +41,4 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+day18-bash-health-check/health-check-log.txt

@@ -27,5 +27,8 @@ jobs:
         run: docker compose -f compose.yaml config --quiet
         working-directory: day17-docker-compose
 
+      - name: Build Node.js application image
+        run: docker build -t day20-day17-app:ci ./day17-docker-compose
+
       - name: Display success
         run: echo "Docker CI environment is ready!"

@@ -24,7 +24,10 @@ operations, automation, and AI-ready engineering foundations.
 | 15 | Docker Basics | ✅ Completed |
 | 16 | Dockerize a Node.js Application | ✅ Completed |
 | 17 | Docker Compose & Configuration | ✅ Completed |
-| 18–30 | Remaining roadmap topics | ⏳ Upcoming |
+| 18 | Bash Health Check Automation | ✅ Completed |
+| 19 | GitHub Actions & CI Fundamentals | ✅ Completed |
+| 20 | Docker CI Automation | ✅ Completed |
+| 21–30 | Remaining roadmap topics | ⏳ Upcoming |
 
 ## Hands-on approach
 

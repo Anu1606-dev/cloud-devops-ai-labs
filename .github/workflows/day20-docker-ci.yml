@@ -20,5 +20,12 @@ jobs:
       - name: Check Docker Compose version
         run: docker compose version
 
+      - name: Prepare environment file
+        run: cp day17-docker-compose/.env.example day17-docker-compose/.env
+
+      - name: Validate Docker Compose configuration
+        run: docker compose -f compose.yaml config --quiet
+        working-directory: day17-docker-compose
+
       - name: Display success
         run: echo "Docker CI environment is ready!"

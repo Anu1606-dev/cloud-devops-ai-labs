@@ -1,0 +1,4 @@
+[DOC 2: MEMORY TROUBLESHOOTING]
+Memory pressure can cause Linux processes to be terminated by the OOM killer.
+Use free -h to inspect available memory.
+Use dmesg to investigate possible OOM events.

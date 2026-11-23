@@ -1,0 +1,4 @@
+[DOC 3: DISK TROUBLESHOOTING]
+Disk exhaustion can cause applications to fail writing files or logs.
+Use df -h to inspect filesystem capacity.
+Use df -i to check inode exhaustion.

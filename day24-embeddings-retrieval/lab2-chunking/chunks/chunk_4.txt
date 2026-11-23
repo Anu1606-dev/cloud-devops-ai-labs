@@ -1,0 +1,4 @@
+[DOC 4: NETWORK TROUBLESHOOTING]
+DNS resolution failures can prevent applications from connecting to services.
+Use getent hosts to verify name resolution.
+Use curl to test HTTP connectivity to the target service.

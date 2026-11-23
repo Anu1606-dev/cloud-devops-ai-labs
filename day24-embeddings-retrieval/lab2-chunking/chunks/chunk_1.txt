@@ -1,0 +1,4 @@
+[DOC 1: CPU TROUBLESHOOTING]
+High CPU utilization can cause application latency and slow response times.
+Use top to identify processes consuming excessive CPU resources.
+Investigate traffic spikes and resource-intensive processes.

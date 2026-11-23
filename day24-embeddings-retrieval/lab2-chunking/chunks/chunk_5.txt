@@ -1,0 +1,4 @@
+[DOC 5: SERVICE TROUBLESHOOTING]
+A failed systemd service may cause an application to become unavailable.
+Use systemctl status to inspect service state.
+Use journalctl -u to inspect service logs.

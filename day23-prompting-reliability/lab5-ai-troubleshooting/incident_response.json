@@ -1,0 +1,114 @@
+{\
+&#x20; "incident": "A cloud-hosted Linux VM running a Node.js API is experiencing intermittent HTTP 503 Service Unavailable errors. The service was previously operational. The root cause is currently unknown and requires investigation.",\
+&#x20; "severity": "SEV-2 (Provisional — customer impact, outage scope, and business criticality are not yet confirmed. Reassess after initial checks.)",\
+&#x20; "possible_causes": [\
+&#x20;   "Node.js application process crashing, hanging, or becoming unresponsive.",\
+&#x20;   "High CPU, memory exhaustion, or resource contention on the VM.",\
+&#x20;   "Reverse proxy (Nginx/Apache) unable to reach the Node.js upstream service.",\
+&#x20;   "Application overload caused by excessive concurrent requests or traffic spikes.",\
+&#x20;   "Database or external dependency failure causing API requests to fail.",\
+&#x20;   "Network connectivity, DNS, or upstream connection issues.",\
+&#x20;   "Recent deployment, configuration change, or environment variable modification.",\
+&#x20;   "Connection pool exhaustion, timeout, or rate limiting.",\
+&#x20;   "Health check failures causing a load balancer to mark the instance unhealthy."\
+&#x20; ],\
+&#x20; "diagnostic_checks": [\
+&#x20;   {\
+&#x20;     "command": "date -Is && uptime",\
+&#x20;     "purpose": "Record the current timestamp and system uptime/load average to correlate the incident and identify unusual system load."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "systemctl status \<node-service-name> --no-pager",\
+&#x20;     "purpose": "Inspect the Node.js service state, recent status information, process details, and whether systemd reports failures. Replace the placeholder with the actual service name."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "journalctl -u \<node-service-name> --since '30 minutes ago' --no-pager",\
+&#x20;     "purpose": "Review recent Node.js service logs for crashes, exceptions, timeouts, dependency failures, or other errors around the time of the 503s."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo journalctl -p err --since '30 minutes ago' --no-pager",\
+&#x20;     "purpose": "Inspect recent system-level error logs for infrastructure, kernel, or service errors that may be contributing to the incident."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "free -h && vmstat 1 5",\
+&#x20;     "purpose": "Check available memory, swap usage, and system activity to identify memory pressure or resource contention."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "df -h && df -i",\
+&#x20;     "purpose": "Verify filesystem capacity and inode availability to identify disk or inode exhaustion that may prevent the application from operating correctly."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "top -b -n 1",\
+&#x20;     "purpose": "Identify CPU usage, memory consumption, and resource-heavy processes at the time of investigation."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "ps aux --sort=-%cpu | head -15 && ps aux --sort=-%mem | head -15",\
+&#x20;     "purpose": "Identify processes consuming the most CPU or memory and investigate possible resource exhaustion."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo ss -lntp",\
+&#x20;     "purpose": "Verify listening TCP ports and identify which processes are listening, including whether the expected Node.js application port is active."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "curl -sS -o /dev/null -w 'HTTP %{http_code}\\\n' http\://127.0.0.1:\<app-port>/health",\
+&#x20;     "purpose": "Test the Node.js API health endpoint locally, bypassing the external load balancer and reverse proxy. Replace the port and endpoint with the actual values."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo nginx -t",\
+&#x20;     "purpose": "If Nginx is installed, validate its configuration syntax without applying changes or restarting the service."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo systemctl status nginx --no-pager",\
+&#x20;     "purpose": "If Nginx is used, inspect its current status to determine whether the reverse proxy is running or reporting errors."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo tail -n 100 /var/log/nginx/error.log",\
+&#x20;     "purpose": "If Nginx is used, inspect recent error logs for upstream connection failures, refused connections, timeouts, or unavailable backend errors."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo tail -n 100 /var/log/nginx/access.log",\
+&#x20;     "purpose": "If Nginx is used, examine request patterns, response status codes, request paths, and timing around the 503 errors."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo ss -antp | head -100",\
+&#x20;     "purpose": "Inspect TCP connection states for signs of connection buildup, excessive connections, or abnormal connection behavior."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "curl -sS -o /dev/null -w 'HTTP %{http_code}\\\n' http\://127.0.0.1:\<proxy-port>/\<api-path>",\
+&#x20;     "purpose": "Test the API through the local reverse proxy to compare its behavior with the direct Node.js health check and isolate the failing layer."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "journalctl --since '30 minutes ago' --no-pager | grep -Ei 'error|timeout|failed|503|oom|killed'",\
+&#x20;     "purpose": "Search recent system journal entries for common incident indicators. This is a supplemental check and should not replace reviewing relevant service logs directly."\
+&#x20;   },\
+&#x20;   {\
+&#x20;     "command": "sudo dmesg -T | grep -Ei 'oom|out of memory|killed process|I/O error'",\
+&#x20;     "purpose": "Check kernel messages for OOM kills, memory-related failures, or storage I/O problems that could explain application instability."\
+&#x20;   }\
+&#x20; ],\
+&#x20; "immediate_actions": [\
+&#x20;   "Confirm the incident start time, frequency, affected endpoints, and whether errors affect all users or only a subset.",\
+&#x20;   "Check cloud provider monitoring for VM CPU, memory, network traffic, disk I/O, and instance health around the failure windows.",\
+&#x20;   "Check load balancer health status, backend target health, connection errors, and health-check history if applicable.",\
+&#x20;   "Preserve application, proxy, system, and cloud monitoring evidence before making changes.",\
+&#x20;   "Correlate 503 timestamps across application logs, reverse proxy logs, and cloud infrastructure metrics.",\
+&#x20;   "Determine whether any deployment, configuration change, scaling event, traffic increase, or dependency change occurred shortly before the incident.",\
+&#x20;   "Avoid restarting the Node.js process, reverse proxy, or VM until evidence is collected and the operational impact and recovery options are assessed.",\
+&#x20;   "If impact is severe or ongoing, notify the incident owner and follow the production incident escalation procedure while continuing diagnostics."\
+&#x20; ],\
+&#x20; "missing_information": [\
+&#x20;   "Cloud provider and VM instance type/specifications.",\
+&#x20;   "Operating system distribution and version.",\
+&#x20;   "Node.js version and application process manager (systemd, PM2, Docker, etc.).",\
+&#x20;   "Reverse proxy or load balancer architecture (Nginx, Apache, cloud load balancer, or other).",\
+&#x20;   "Actual application port and health-check endpoint.",\
+&#x20;   "Exact timestamps, frequency, and duration of the 503 responses.",\
+&#x20;   "Whether the 503 response originates from Node.js, the reverse proxy, or the load balancer.",\
+&#x20;   "Recent deployments, configuration changes, infrastructure changes, or scaling events.",\
+&#x20;   "Current CPU, memory, disk, network, and application metrics.",\
+&#x20;   "Application, proxy, and system logs corresponding to the incident.",\
+&#x20;   "Database, cache, and external API dependency health.",\
+&#x20;   "Number of affected users, endpoints, and regions and whether the impact is intermittent or continuous."\
+&#x20; ],\
+&#x20; "root_cause_confirmed": false\
+}

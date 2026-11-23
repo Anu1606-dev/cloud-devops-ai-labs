@@ -1,0 +1,24 @@
+[DOC 1: CPU TROUBLESHOOTING]
+High CPU utilization can cause application latency and slow response times.
+Use top to identify processes consuming excessive CPU resources.
+Investigate traffic spikes and resource-intensive processes.
+
+[DOC 2: MEMORY TROUBLESHOOTING]
+Memory pressure can cause Linux processes to be terminated by the OOM killer.
+Use free -h to inspect available memory.
+Use dmesg to investigate possible OOM events.
+
+[DOC 3: DISK TROUBLESHOOTING]
+Disk exhaustion can cause applications to fail writing files or logs.
+Use df -h to inspect filesystem capacity.
+Use df -i to check inode exhaustion.
+
+[DOC 4: NETWORK TROUBLESHOOTING]
+DNS resolution failures can prevent applications from connecting to services.
+Use getent hosts to verify name resolution.
+Use curl to test HTTP connectivity to the target service.
+
+[DOC 5: SERVICE TROUBLESHOOTING]
+A failed systemd service may cause an application to become unavailable.
+Use systemctl status to inspect service state.
+Use journalctl -u to inspect service logs.

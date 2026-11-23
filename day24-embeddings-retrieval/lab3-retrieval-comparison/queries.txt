@@ -1,0 +1,9 @@
+QUERY 1: My machine is overwhelmed by processor load.
+
+QUERY 2: The application is running out of available RAM.
+
+QUERY 3: My website cannot resolve the backend hostname.
+
+QUERY 4: My service is unable to write logs because storage is full.
+
+QUERY 5: My application is unavailable because its Linux service crashed.

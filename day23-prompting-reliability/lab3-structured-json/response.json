@@ -1,0 +1,16 @@
+{
+  "issue": "HTTP 500 Internal Server Error",
+  "severity": "high",
+  "possible_causes": [
+    "Application exception",
+    "Database connectivity failure",
+    "Invalid application configuration"
+  ],
+  "diagnostic_commands": [
+    "sudo journalctl -u myapp --since '10 minutes ago'",
+    "curl -i http://localhost:8080/health",
+    "ss -lntp"
+  ],
+  "root_cause_confirmed": false,
+  "needs_more_information": true
+}

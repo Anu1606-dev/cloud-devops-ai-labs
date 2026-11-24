@@ -102,3 +102,54 @@ class PromptInjectionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class SensitiveDataRedactionTests(unittest.TestCase):
+
+    def test_redacts_aws_access_key(self):
+        from security import redact_sensitive_data
+
+        result = redact_sensitive_data("AWS key: AKIAIOSFODNN7EXAMPLE")
+        self.assertNotIn("AKIAIOSFODNN7EXAMPLE", result)
+        self.assertIn("[REDACTED_AWS_ACCESS_KEY]", result)
+
+    def test_redacts_bearer_token(self):
+        from security import redact_sensitive_data
+
+        result = redact_sensitive_data("Authorization: Bearer abc.def.123")
+        self.assertNotIn("abc.def.123", result)
+        self.assertIn("Bearer [REDACTED]", result)
+
+    def test_redacts_password_and_api_key_assignments(self):
+        from security import redact_sensitive_data
+
+        result = redact_sensitive_data(
+            "password=hunter2 api_key='sk-example-secret'"
+        )
+        self.assertNotIn("hunter2", result)
+        self.assertNotIn("sk-example-secret", result)
+        self.assertEqual(result.count("[REDACTED]"), 2)
+
+    def test_redacts_jwt(self):
+        from security import redact_sensitive_data
+
+        token = (
+            "eyJhbGciOiJIUzI1NiJ9."
+            "eyJzdWIiOiIxMjM0NTY3ODkwIn0."
+            "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        )
+        result = redact_sensitive_data(f"Session: {token}")
+        self.assertNotIn(token, result)
+        self.assertIn("[REDACTED_JWT]", result)
+
+    def test_preserves_normal_troubleshooting_text(self):
+        from security import redact_sensitive_data
+
+        text = "Check systemctl status nginx and inspect HTTP 503 logs."
+        self.assertEqual(redact_sensitive_data(text), text)
+
+    def test_handles_non_string_values(self):
+        from security import redact_sensitive_data
+
+        self.assertIsNone(redact_sensitive_data(None))
+        self.assertEqual(redact_sensitive_data(123), 123)

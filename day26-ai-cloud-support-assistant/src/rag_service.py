@@ -14,14 +14,14 @@ sys.path.insert(0, str(RAG_DIR))
 
 from rag_pipeline import retrieve, build_context, build_prompt
 from model_service import generate_response
-from security import contains_prompt_injection
+from security import contains_prompt_injection, redact_sensitive_data
 
 
 def main():
     if len(sys.argv) < 2:
         raise ValueError("A user query is required.")
 
-    query = sys.argv[1].strip()
+    query = redact_sensitive_data(sys.argv[1].strip())
 
     if not query:
         raise ValueError("Query cannot be empty.")
@@ -55,8 +55,8 @@ def main():
     results = retrieve(query, top_k=3)
 
     # Step 2: Build context and augmented prompt.
-    context = build_context(results)
-    prompt = build_prompt(query, context)
+    context = redact_sensitive_data(build_context(results))
+    prompt = redact_sensitive_data(build_prompt(query, context))
 
     # Step 3: Generate the assistant response.
     model_result = generate_response(
@@ -71,7 +71,7 @@ def main():
         "retrieved_documents": results,
         "context": context,
         "prompt": prompt,
-        "answer": model_result["answer"],
+        "answer": redact_sensitive_data(model_result["answer"]),
         "model": model_result["model"],
         "sources": model_result["sources"],
         "security": {
@@ -86,5 +86,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as error:
-        print(str(error), file=sys.stderr)
+        print(f"RAG service failed: {type(error).__name__}", file=sys.stderr)
         sys.exit(1)

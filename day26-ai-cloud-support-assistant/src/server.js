@@ -3,6 +3,7 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const crypto = require("crypto");
 const { execFile } = require("child_process");
 const { rateLimit } = require("express-rate-limit");
@@ -34,7 +35,10 @@ const metrics = {
   status4xx: 0,
   status5xx: 0,
   totalDurationMs: 0,
-  maxDurationMs: 0
+  maxDurationMs: 0,
+  ragBackendFailures: 0,
+  ragInvalidResponses: 0,
+  unexpectedApiErrors: 0
 };
 
 // Request logging middleware.
@@ -122,6 +126,11 @@ app.get("/metrics", (req, res) => {
       "4xx": metrics.status4xx,
       "5xx": metrics.status5xx
     },
+    failure_counts: {
+      rag_backend: metrics.ragBackendFailures,
+      invalid_backend_response: metrics.ragInvalidResponses,
+      unexpected_api: metrics.unexpectedApiErrors
+    },
     latency_ms: {
       total: metrics.totalDurationMs,
       average: averageDurationMs,
@@ -143,6 +152,32 @@ app.get("/health", (req, res) => {
   res.status(200).json({
     status: "healthy",
     service: "ai-cloud-support-assistant"
+  });
+});
+
+// Readiness endpoint: checks required local RAG runtime components.
+app.get("/ready", (req, res) => {
+  let pythonAvailable = false;
+  let ragScriptAvailable = false;
+
+  try {
+    fs.accessSync(PYTHON_PATH, fs.constants.X_OK);
+    pythonAvailable = true;
+  } catch {}
+
+  try {
+    fs.accessSync(RAG_SCRIPT, fs.constants.R_OK);
+    ragScriptAvailable = true;
+  } catch {}
+
+  const ready = pythonAvailable && ragScriptAvailable;
+
+  res.status(ready ? 200 : 503).json({
+    status: ready ? "ready" : "not_ready",
+    checks: {
+      python_runtime: pythonAvailable ? "available" : "unavailable",
+      rag_script: ragScriptAvailable ? "available" : "unavailable"
+    }
   });
 });
 
@@ -179,6 +214,7 @@ app.post("/api/rag", ragLimiter, (req, res) => {
     },
     (error, stdout, stderr) => {
       if (error) {
+        metrics.ragBackendFailures += 1;
         logEvent("error", "rag_backend_failure", {
           request_id: req.requestId,
           error_name: error.name,
@@ -204,6 +240,7 @@ app.post("/api/rag", ragLimiter, (req, res) => {
           ...ragResult
         });
       } catch (parseError) {
+        metrics.ragInvalidResponses += 1;
         logEvent("error", "rag_invalid_response", {
           request_id: req.requestId,
           error_name: parseError.name
@@ -231,6 +268,7 @@ app.use((error, req, res, next) => {
     });
   }
 
+  metrics.unexpectedApiErrors += 1;
   logEvent("error", "unexpected_api_error", {
     request_id: req.requestId || "unavailable",
     error_name: error.name || "Error"

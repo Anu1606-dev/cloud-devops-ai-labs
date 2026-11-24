@@ -144,8 +144,10 @@ app.use((error, req, res, next) => {
 });
 
 // Start the API.
-app.listen(PORT, "127.0.0.1", () => {
+const HOST = process.env.HOST || "0.0.0.0";
+
+app.listen(PORT, HOST, () => {
   console.log(
-    `Assistant API running on http://127.0.0.1:${PORT}`
+    `Assistant API running on http://${HOST}:${PORT}`
   );
 });

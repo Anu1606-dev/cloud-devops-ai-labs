@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cloud Support Assistant</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <div>
+                <p class="eyebrow">CLOUD OPERATIONS • AI ASSISTANT</p>
+                <h1>Cloud Support Assistant ☁️</h1>
+                <p class="subtitle">
+                    Ask questions about Linux, networking, services and cloud incidents.
+                </p>
+            </div>
+            <span class="status">● Local API</span>
+        </header>
+
+        <section class="notice">
+            <strong>Demo mode:</strong>
+            Responses use a simulated model adapter with retrieved knowledge-base
+            context. No live LLM inference is performed.
+        </section>
+
+        <section class="chat-panel">
+            <div id="messages" class="messages" aria-live="polite">
+                <article class="message assistant">
+                    <div class="message-label">ASSISTANT</div>
+                    <p>
+                        Hello! I'm your Cloud Support Assistant.
+                        Describe an infrastructure issue, and I'll retrieve
+                        relevant troubleshooting guidance.
+                    </p>
+                </article>
+            </div>
+
+            <form id="chat-form" class="chat-form">
+                <label for="query">Your question</label>
+                <textarea
+                    id="query"
+                    maxlength="500"
+                    rows="3"
+                    placeholder="Example: Our Node.js API is returning HTTP 503 errors..."
+                    required
+                ></textarea>
+
+                <div class="form-footer">
+                    <span id="character-count">0 / 500</span>
+                    <button id="send-button" type="submit">
+                        Send question →
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section id="result-section" class="result-section hidden">
+            <h2>Retrieved knowledge sources</h2>
+            <div id="sources" class="sources"></div>
+        </section>
+
+        <footer>
+            Day 26 · Cloud + AI Learning Project
+        </footer>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>

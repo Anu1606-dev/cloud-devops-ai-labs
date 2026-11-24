@@ -12,6 +12,10 @@ const PORT = process.env.PORT || 3000;
 // Limit incoming JSON request bodies to 10 KB.
 app.use(express.json({ limit: "10kb" }));
 
+
+// Serve the frontend files from the public directory.
+app.use(express.static(path.join(__dirname, "../public")));
+
 // Python environment and RAG service paths.
 const PYTHON_PATH =
   process.env.PYTHON_PATH ||

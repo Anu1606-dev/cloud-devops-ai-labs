@@ -3,17 +3,55 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const crypto = require("crypto");
 const { execFile } = require("child_process");
 const { rateLimit } = require("express-rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+
+// Structured JSON logging.
+function logEvent(level, event, details = {}) {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    level,
+    event,
+    ...details
+  }));
+}
 
 // Limit incoming JSON request bodies to 10 KB.
 app.use(express.json({ limit: "10kb" }));
 
+// Request logging middleware.
+// Register before routes so all responses are observed.
+app.use((req, res, next) => {
+  const startTime = Date.now();
 
-// Serve the frontend files from the public directory.
+  req.requestId = crypto.randomUUID();
+  res.setHeader("X-Request-ID", req.requestId);
+
+  res.on("finish", () => {
+    const durationMs = Date.now() - startTime;
+
+    const level =
+      res.statusCode >= 500 ? "error" :
+      res.statusCode >= 400 ? "warn" : "info";
+
+    logEvent(level, "http_request", {
+      request_id: req.requestId,
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      duration_ms: durationMs
+    });
+  });
+
+  next();
+});
+
+// Serve frontend files.
 app.use(express.static(path.join(__dirname, "../public")));
 
 // Python environment and RAG service paths.
@@ -57,7 +95,6 @@ app.get("/health", (req, res) => {
 app.post("/api/rag", ragLimiter, (req, res) => {
   const query = req.body?.query;
 
-  // Validate query type.
   if (typeof query !== "string") {
     return res.status(400).json({
       error: "Query must be a string."
@@ -66,21 +103,18 @@ app.post("/api/rag", ragLimiter, (req, res) => {
 
   const trimmedQuery = query.trim();
 
-  // Reject empty queries.
   if (!trimmedQuery) {
     return res.status(400).json({
       error: "A non-empty query is required."
     });
   }
 
-  // Limit query length.
   if (trimmedQuery.length > 500) {
     return res.status(400).json({
       error: "Query must not exceed 500 characters."
     });
   }
 
-  // Execute the Python RAG service without shell interpolation.
   execFile(
     PYTHON_PATH,
     [RAG_SCRIPT, trimmedQuery],
@@ -90,7 +124,11 @@ app.post("/api/rag", ragLimiter, (req, res) => {
     },
     (error, stdout, stderr) => {
       if (error) {
-        console.error("RAG backend execution failed:", error.message);
+        logEvent("error", "rag_backend_failure", {
+          request_id: req.requestId,
+          error_name: error.name,
+          error_code: error.code || "UNKNOWN"
+        });
 
         if (error.killed || error.code === "ETIMEDOUT") {
           return res.status(504).json({
@@ -111,7 +149,10 @@ app.post("/api/rag", ragLimiter, (req, res) => {
           ...ragResult
         });
       } catch (parseError) {
-        console.error("Invalid RAG backend response.");
+        logEvent("error", "rag_invalid_response", {
+          request_id: req.requestId,
+          error_name: parseError.name
+        });
 
         return res.status(502).json({
           error: "Invalid response received from RAG backend."
@@ -122,7 +163,6 @@ app.post("/api/rag", ragLimiter, (req, res) => {
 });
 
 // Centralized error handling middleware.
-// This must be registered after routes.
 app.use((error, req, res, next) => {
   if (error.type === "entity.too.large") {
     return res.status(413).json({
@@ -136,7 +176,10 @@ app.use((error, req, res, next) => {
     });
   }
 
-  console.error("Unexpected API error:", error.message);
+  logEvent("error", "unexpected_api_error", {
+    request_id: req.requestId || "unavailable",
+    error_name: error.name || "Error"
+  });
 
   return res.status(500).json({
     error: "Internal server error."
@@ -144,10 +187,10 @@ app.use((error, req, res, next) => {
 });
 
 // Start the API.
-const HOST = process.env.HOST || "0.0.0.0";
-
 app.listen(PORT, HOST, () => {
-  console.log(
-    `Assistant API running on http://${HOST}:${PORT}`
-  );
+  logEvent("info", "application_started", {
+    host: HOST,
+    port: PORT
+  });
 });
+

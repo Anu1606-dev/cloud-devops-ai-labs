@@ -24,6 +24,19 @@ function logEvent(level, event, details = {}) {
 // Limit incoming JSON request bodies to 10 KB.
 app.use(express.json({ limit: "10kb" }));
 
+// In-memory metrics for this Node.js process.
+// These counters reset whenever the application restarts.
+const metrics = {
+  startedAt: new Date().toISOString(),
+  totalRequests: 0,
+  status2xx: 0,
+  status3xx: 0,
+  status4xx: 0,
+  status5xx: 0,
+  totalDurationMs: 0,
+  maxDurationMs: 0
+};
+
 // Request logging middleware.
 // Register before routes so all responses are observed.
 app.use((req, res, next) => {
@@ -35,6 +48,23 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const durationMs = Date.now() - startTime;
 
+
+    // Exclude /metrics requests to prevent self-counting.
+    if (req.path !== "/metrics") {
+      metrics.totalRequests += 1;
+      metrics.totalDurationMs += durationMs;
+      metrics.maxDurationMs = Math.max(metrics.maxDurationMs, durationMs);
+
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        metrics.status2xx += 1;
+      } else if (res.statusCode >= 300 && res.statusCode < 400) {
+        metrics.status3xx += 1;
+      } else if (res.statusCode >= 400 && res.statusCode < 500) {
+        metrics.status4xx += 1;
+      } else if (res.statusCode >= 500) {
+        metrics.status5xx += 1;
+      }
+    }
     const level =
       res.statusCode >= 500 ? "error" :
       res.statusCode >= 400 ? "warn" : "info";
@@ -73,6 +103,31 @@ const ragLimiter = rateLimit({
   message: {
     error: "Too many requests. Please try again later."
   }
+});
+
+// Metrics endpoint. Its own requests are excluded from the counters.
+app.get("/metrics", (req, res) => {
+  const uptimeSeconds = process.uptime();
+  const averageDurationMs = metrics.totalRequests
+    ? Number((metrics.totalDurationMs / metrics.totalRequests).toFixed(2))
+    : 0;
+
+  res.status(200).json({
+    started_at: metrics.startedAt,
+    uptime_seconds: Number(uptimeSeconds.toFixed(2)),
+    total_requests: metrics.totalRequests,
+    status_counts: {
+      "2xx": metrics.status2xx,
+      "3xx": metrics.status3xx,
+      "4xx": metrics.status4xx,
+      "5xx": metrics.status5xx
+    },
+    latency_ms: {
+      total: metrics.totalDurationMs,
+      average: averageDurationMs,
+      maximum: metrics.maxDurationMs
+    }
+  });
 });
 
 // Root endpoint.

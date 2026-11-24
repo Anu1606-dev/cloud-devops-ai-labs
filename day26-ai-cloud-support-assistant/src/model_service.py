@@ -1,4 +1,7 @@
 
+from security import is_suspicious_instruction
+
+
 def generate_response(query, context, retrieved_documents):
     """
     Simulate an LLM response using retrieved RAG context.
@@ -24,6 +27,9 @@ def generate_response(query, context, retrieved_documents):
             instruction = line.strip()
 
             if instruction.startswith(("Use ", "Investigate ")):
+                if is_suspicious_instruction(instruction):
+                    continue
+
                 if instruction not in diagnostic_steps:
                     diagnostic_steps.append(instruction)
 

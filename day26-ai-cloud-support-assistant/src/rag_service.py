@@ -14,6 +14,7 @@ sys.path.insert(0, str(RAG_DIR))
 
 from rag_pipeline import retrieve, build_context, build_prompt
 from model_service import generate_response
+from security import contains_prompt_injection
 
 
 def main():
@@ -24,6 +25,31 @@ def main():
 
     if not query:
         raise ValueError("Query cannot be empty.")
+
+    # Reject common prompt-injection attempts before retrieval.
+    if contains_prompt_injection(query):
+        print(json.dumps({
+            "query": query,
+            "retrieved_documents": [],
+            "context": "",
+            "prompt": "",
+            "answer": (
+                "This request contains instructions that the assistant "
+                "cannot follow. Please submit a normal cloud troubleshooting "
+                "question without attempts to override system instructions "
+                "or disclose protected information."
+            ),
+            "model": {
+                "provider": "mock",
+                "mode": "simulation",
+                "inference_performed": False
+            },
+            "sources": [],
+            "security": {
+                "input_screening": "blocked"
+            }
+        }))
+        return
 
     # Step 1: Retrieve relevant knowledge.
     results = retrieve(query, top_k=3)
@@ -47,7 +73,10 @@ def main():
         "prompt": prompt,
         "answer": model_result["answer"],
         "model": model_result["model"],
-        "sources": model_result["sources"]
+        "sources": model_result["sources"],
+        "security": {
+            "input_screening": "passed"
+        }
     }
 
     print(json.dumps(response))

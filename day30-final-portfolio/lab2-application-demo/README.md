@@ -57,6 +57,22 @@ Coverage includes:
 
 ## 8. Result
 
-Record the observed HTTP status codes and test results from the
-execution performed for this lab. Do not interpret successful
-retrieval as proof of live LLM inference.
+Docker image cloud-support-assistant:day30 built successfully.
+Container reached healthy status.
+
+Observed HTTP results:
+- GET /health: 200 OK
+- GET /ready: 200 OK
+- GET /metrics: 200 OK
+- POST /api/rag: 200 OK
+- Empty RAG query: 400 Bad Request
+
+RAG retrieval returned three relevant knowledge-base documents.
+The response explicitly identified the model as a mock adapter
+with inference_performed=false.
+
+Security tests: 12/12 passed.
+Python compilation: passed.
+Node.js syntax validation: passed.
+
+The application was validated locally using Docker.
